@@ -27,17 +27,13 @@ def get_district_judges(location_description: str, judges_list: list[str]) -> li
     judges_str = "\n".join(f"  - {name}" for name in judges_list)
 
     prompt = (
-        f"You are a legal research assistant with access to the web. "
-        f"Given the following location description, determine which US federal "
-        f"district court and division covers that location. Use resources like "
-        f"https://ballotpedia.org/United_States_District_Court to verify.\n\n"
+        f"Given the location below, determine the US federal district court "
+        f"and division that covers it. From the judges list, return ONLY the "
+        f"names of currently active judges (including senior status) in that "
+        f"district as a JSON array. If none match, return [].\n\n"
         f"Location: \"{location_description}\"\n\n"
-        f"From the following list of judges, return ONLY the names of judges "
-        f"who are currently active (including senior status) in the federal "
-        f"district court that covers this location. Return the names as a "
-        f"JSON array of strings. If none match, return an empty array [].\n\n"
-        f"Judges list:\n{judges_str}\n\n"
-        f"Respond with ONLY a valid JSON array, no other text."
+        f"Judges:\n{judges_str}\n\n"
+        f"JSON array only:"
     )
 
     headers = {
@@ -48,17 +44,16 @@ def get_district_judges(location_description: str, judges_list: list[str]) -> li
     }
 
     payload = {
-        "model": "google/gemini-2.0-flash-001",
-        "plugins": [{"id": "web"}],
+        "model": "google/gemini-2.0-flash-lite-001",
         "messages": [
             {"role": "user", "content": prompt}
         ],
-        "temperature": 0.1,
+        "temperature": 0.0,
     }
 
     try:
         response = requests.post(
-            OPENROUTER_URL, headers=headers, json=payload, timeout=60
+            OPENROUTER_URL, headers=headers, json=payload, timeout=20
         )
         response.raise_for_status()
         content = response.json()["choices"][0]["message"]["content"].strip()

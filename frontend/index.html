@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cold Cases — Find Your Attorney</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:wght@700;900&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --top-color: #6c5ce7;
+      --bottom-color: #00cec9;
+      --accent: #fd79a8;
+      --gold: #fdcb6e;
+      --dark: #0a0a1a;
+      --glass: rgba(255, 255, 255, 0.08);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--dark);
+      color: #fff;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* ── Liquid Background ─────────────────────────────────── */
+    .liquid-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .liquid-top {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 55%;
+      background: linear-gradient(135deg, var(--top-color), #a29bfe);
+    }
+
+    .liquid-bottom {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 55%;
+      background: linear-gradient(135deg, var(--bottom-color), #55efc4);
+    }
+
+    /* SVG wave separator */
+    .wave-separator {
+      position: absolute;
+      top: 42%;
+      left: 0; right: 0;
+      z-index: 1;
+      line-height: 0;
+    }
+
+    .wave-separator svg {
+      width: 100%;
+      height: 160px;
+      filter: drop-shadow(0 4px 30px rgba(0,0,0,0.3));
+    }
+
+    .wave-path-1 { fill: var(--top-color); opacity: 0.7; }
+    .wave-path-2 { fill: var(--bottom-color); opacity: 0.5; }
+    .wave-path-3 { fill: rgba(255,255,255,0.08); }
+
+    /* Animate waves */
+    @keyframes waveFloat1 {
+      0%, 100% { d: path("M0,80 C200,40 400,120 600,80 C800,40 1000,120 1200,80 L1200,160 L0,160Z"); }
+      50% { d: path("M0,80 C200,120 400,40 600,80 C800,120 1000,40 1200,80 L1200,160 L0,160Z"); }
+    }
+    @keyframes waveFloat2 {
+      0%, 100% { d: path("M0,90 C300,50 500,130 700,90 C900,50 1100,130 1200,90 L1200,160 L0,160Z"); }
+      50% { d: path("M0,90 C300,130 500,50 700,90 C900,130 1100,50 1200,90 L1200,160 L0,160Z"); }
+    }
+    @keyframes waveFloat3 {
+      0%, 100% { d: path("M0,100 C250,70 450,130 650,100 C850,70 1050,130 1200,100 L1200,160 L0,160Z"); }
+      50% { d: path("M0,100 C250,130 450,70 650,100 C850,130 1050,70 1200,100 L1200,160 L0,160Z"); }
+    }
+
+    .wave-path-1 { animation: waveFloat1 6s ease-in-out infinite; }
+    .wave-path-2 { animation: waveFloat2 8s ease-in-out infinite; }
+    .wave-path-3 { animation: waveFloat3 10s ease-in-out infinite; }
+
+    /* Floating orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.3;
+      animation: orbFloat 12s ease-in-out infinite alternate;
+    }
+    .orb-1 { width: 400px; height: 400px; background: var(--accent); top: 10%; left: -5%; animation-delay: 0s; }
+    .orb-2 { width: 300px; height: 300px; background: var(--gold); bottom: 10%; right: -5%; animation-delay: -4s; }
+    .orb-3 { width: 250px; height: 250px; background: #74b9ff; top: 60%; left: 40%; animation-delay: -8s; }
+
+    @keyframes orbFloat {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(40px, -30px) scale(1.1); }
+    }
+
+    /* ── Main Content ──────────────────────────────────────── */
+    .content {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── Start Screen ──────────────────────────────────────── */
+    #start-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+      text-align: center;
+      transition: opacity 0.6s, transform 0.6s;
+    }
+
+    #start-screen.hidden {
+      opacity: 0;
+      transform: scale(0.9);
+      pointer-events: none;
+      position: absolute;
+    }
+
+    .title {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #fff, var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: none;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      font-weight: 300;
+      color: rgba(255,255,255,0.7);
+      max-width: 500px;
+    }
+
+    /* Play Button */
+    .play-btn {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.3);
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .play-btn::before {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-top-color: var(--gold);
+      border-right-color: var(--accent);
+      animation: spin 3s linear infinite;
+    }
+
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    .play-btn:hover {
+      transform: scale(1.1);
+      border-color: var(--gold);
+      box-shadow: 0 0 40px rgba(253, 203, 110, 0.3);
+    }
+
+    .play-btn svg {
+      width: 40px;
+      height: 40px;
+      fill: #fff;
+      margin-left: 6px;
+    }
+
+    /* ── Recording State ───────────────────────────────────── */
+    #recording-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      text-align: center;
+    }
+
+    #recording-screen.active {
+      display: flex;
+    }
+
+    .recording-indicator {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(253,121,168,0.4); }
+      50% { transform: scale(1.15); opacity: 0.9; box-shadow: 0 0 40px 20px rgba(253,121,168,0.1); }
+    }
+
+    .recording-text {
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+
+    .recording-sub {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* ── Loading State ─────────────────────────────────────── */
+    #loading-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    #loading-screen.active { display: flex; }
+
+    .loader {
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(255,255,255,0.1);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    /* ── Story Screen ──────────────────────────────────────── */
+    #story-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+      width: 100%;
+      max-width: 900px;
+      padding: 40px 20px;
+    }
+
+    #story-screen.active { display: flex; }
+
+    .narration-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      text-align: center;
+      min-height: 100px;
+      line-height: 1.5;
+      transition: opacity 0.4s;
+      color: rgba(255,255,255,0.95);
+      text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+    }
+
+    /* Visual card */
+    .visual-card {
+      width: 100%;
+      max-width: 600px;
+      min-height: 300px;
+      background: var(--glass);
+      backdrop-filter: blur(30px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 40px;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .visual-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .visual-card img {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid rgba(255,255,255,0.2);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+    }
+
+    .entity-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+
+    .entity-role {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+    }
+
+    .score-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--gold), #e17055);
+      color: var(--dark);
+      font-weight: 800;
+      font-size: 1.5rem;
+      padding: 10px 28px;
+      border-radius: 50px;
+    }
+
+    .rank-badge {
+      position: absolute;
+      top: -12px;
+      right: -12px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #e84393);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 20px rgba(232,67,147,0.4);
+    }
+
+    /* Intro stats */
+    .stat-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 5rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--gold), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* Progress bar */
+    .progress-bar {
+      width: 100%;
+      max-width: 600px;
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--gold));
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.3s linear;
+    }
+
+    /* ── Responsive ────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .title { font-size: 2.2rem; }
+      .narration-text { font-size: 1.2rem; }
+      .stat-number { font-size: 3.5rem; }
+      .visual-card { padding: 24px; min-height: 220px; }
+      .visual-card img { width: 120px; height: 120px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Liquid Background -->
+  <div class="liquid-bg">
+    <div class="liquid-top"></div>
+    <div class="liquid-bottom"></div>
+    <div class="wave-separator">
+      <svg viewBox="0 0 1200 160" preserveAspectRatio="none">
+        <path class="wave-path-1" d="M0,80 C200,40 400,120 600,80 C800,40 1000,120 1200,80 L1200,160 L0,160Z"/>
+        <path class="wave-path-2" d="M0,90 C300,50 500,130 700,90 C900,50 1100,130 1200,90 L1200,160 L0,160Z"/>
+        <path class="wave-path-3" d="M0,100 C250,70 450,130 650,100 C850,70 1050,130 1200,100 L1200,160 L0,160Z"/>
+      </svg>
+    </div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Start Screen -->
+    <div id="start-screen">
+      <h1 class="title">Cold Cases</h1>
+      <p class="subtitle">Tell me about your case and I'll find the best attorney for your federal district.</p>
+      <button class="play-btn" id="play-btn" onclick="startRecording()">
+        <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+      </button>
+      <p class="subtitle" style="font-size: 0.8rem; opacity: 0.4;">Press play and speak</p>
+    </div>
+
+    <!-- Recording Screen -->
+    <div id="recording-screen">
+      <div class="recording-indicator"></div>
+      <p class="recording-text">Listening...</p>
+      <p class="recording-sub">I'll stop when you're done speaking</p>
+      <button class="play-btn" style="width:60px;height:60px;border-color:var(--accent)" onclick="stopRecording()">
+        <svg viewBox="0 0 24 24" style="width:20px;height:20px;margin:0"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+      </button>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+      <div class="loader"></div>
+      <p class="subtitle" id="loading-text">Transcribing your request...</p>
+    </div>
+
+    <!-- Story Screen -->
+    <div id="story-screen">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      <p class="narration-text" id="narration-text"></p>
+      <div class="visual-card" id="visual-card"></div>
+    </div>
+
+  </div>
+
+  <script>
+    const API = '';
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let silenceTimer = null;
+    let audioContext = null;
+    let analyser = null;
+    let silenceStart = null;
+    const SILENCE_THRESHOLD = 0.01;
+    const SILENCE_MS = 1500;
+
+    // ── Screen Management ─────────────────────────────────
+
+    function showScreen(id) {
+      ['start-screen', 'recording-screen', 'loading-screen', 'story-screen'].forEach(s => {
+        const el = document.getElementById(s);
+        if (s === id) {
+          el.classList.add('active');
+          el.classList.remove('hidden');
+          el.style.display = 'flex';
+        } else {
+          el.classList.add('hidden');
+          el.classList.remove('active');
+          el.style.display = 'none';
+        }
+      });
+    }
+
+    // ── Recording ─────────────────────────────────────────
+
+    async function startRecording() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioChunks = [];
+
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+        mediaRecorder.onstop = () => {
+          stream.getTracks().forEach(t => t.stop());
+          handleRecordingDone();
+        };
+
+        // Silence detection
+        audioContext = new AudioContext();
+        const source = audioContext.createMediaStreamSource(stream);
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 512;
+        source.connect(analyser);
+
+        let speechStarted = false;
+        silenceStart = null;
+        const dataArray = new Float32Array(analyser.fftSize);
+
+        function checkSilence() {
+          if (!mediaRecorder || mediaRecorder.state !== 'recording') return;
+          analyser.getFloatTimeDomainData(dataArray);
+          let rms = 0;
+          for (let i = 0; i < dataArray.length; i++) rms += dataArray[i] * dataArray[i];
+          rms = Math.sqrt(rms / dataArray.length);
+
+          if (rms > SILENCE_THRESHOLD) {
+            speechStarted = true;
+            silenceStart = null;
+          } else if (speechStarted) {
+            if (!silenceStart) silenceStart = Date.now();
+            else if (Date.now() - silenceStart > SILENCE_MS) {
+              stopRecording();
+              return;
+            }
+          }
+          requestAnimationFrame(checkSilence);
+        }
+
+        mediaRecorder.start();
+        showScreen('recording-screen');
+        requestAnimationFrame(checkSilence);
+
+      } catch (err) {
+        alert('Microphone access required. Please allow mic access and try again.');
+      }
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+      }
+      if (audioContext) {
+        audioContext.close();
+        audioContext = null;
+      }
+    }
+
+    async function handleRecordingDone() {
+      showScreen('loading-screen');
+      document.getElementById('loading-text').textContent = 'Transcribing your request...';
+
+      const blob = new Blob(audioChunks, { type: 'audio/webm' });
+      const formData = new FormData();
+      formData.append('audio', blob, 'recording.webm');
+
+      try {
+        // Transcribe
+        const transcribeResp = await fetch(`${API}/api/transcribe`, { method: 'POST', body: formData });
+        const { text } = await transcribeResp.json();
+
+        if (!text) {
+          alert("Couldn't catch that. Try again!");
+          showScreen('start-screen');
+          return;
+        }
+
+        document.getElementById('loading-text').textContent = `"${text}" — Finding your attorneys...`;
+
+        // Run pipeline
+        const pipelineResp = await fetch(`${API}/api/pipeline`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: text }),
+        });
+        const data = await pipelineResp.json();
+
+        playStory(data);
+
+      } catch (err) {
+        console.error(err);
+        alert('Something went wrong. Check the console.');
+        showScreen('start-screen');
+      }
+    }
+
+    // ── Story Playback ────────────────────────────────────
+
+    function playStory(data) {
+      showScreen('story-screen');
+
+      const { audio_base64, segments } = data;
+      const narrationEl = document.getElementById('narration-text');
+      const cardEl = document.getElementById('visual-card');
+      const progressEl = document.getElementById('progress-fill');
+
+      // Create audio
+      const audioSrc = `data:audio/mpeg;base64,${audio_base64}`;
+      const audio = new Audio(audioSrc);
+
+      // Pre-generate attorney avatar URLs (deterministic by name)
+      function avatarUrl(name) {
+        const seed = encodeURIComponent(name);
+        return `https://api.dicebear.com/7.x/personas/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
+      }
+
+      // Schedule visual events
+      audio.ontimeupdate = () => {
+        const t = audio.currentTime;
+        const duration = audio.duration || 1;
+        progressEl.style.width = `${(t / duration) * 100}%`;
+
+        // Find current segment
+        for (let i = segments.length - 1; i >= 0; i--) {
+          if (t >= segments[i].start_time) {
+            renderSegment(segments[i], narrationEl, cardEl, avatarUrl);
+            break;
+          }
+        }
+      };
+
+      audio.onended = () => {
+        progressEl.style.width = '100%';
+        setTimeout(() => {
+          narrationEl.innerHTML = '<span style="color: var(--gold);">Your story is complete.</span>';
+          cardEl.classList.remove('visible');
+          setTimeout(() => showScreen('start-screen'), 4000);
+        }, 1500);
+      };
+
+      audio.play();
+    }
+
+    let currentSegmentText = '';
+
+    function renderSegment(seg, narrationEl, cardEl, avatarUrl) {
+      if (seg.text === currentSegmentText) return;
+      currentSegmentText = seg.text;
+
+      narrationEl.style.opacity = 0;
+      setTimeout(() => {
+        narrationEl.textContent = seg.text;
+        narrationEl.style.opacity = 1;
+      }, 200);
+
+      const { type, data } = seg;
+
+      cardEl.classList.remove('visible');
+
+      setTimeout(() => {
+        if (type === 'intro') {
+          cardEl.innerHTML = `
+            <div class="stat-number">${data.judge_count}</div>
+            <div class="stat-label">Federal District Judges</div>
+          `;
+        } else if (type === 'judge_highlight') {
+          const imgSrc = data.judge_image || avatarUrl(data.judge);
+          cardEl.innerHTML = `
+            <img src="${imgSrc}" alt="${data.judge}" onerror="this.src='${avatarUrl(data.judge)}'" />
+            <div class="entity-role">Federal Judge</div>
+            <div class="entity-name">${data.judge}</div>
+            <div class="score-badge">Score: ${data.score}</div>
+          `;
+        } else if (type === 'attorney') {
+          const imgSrc = avatarUrl(data.attorney);
+          cardEl.innerHTML = `
+            <div style="position:relative;display:inline-block">
+              <img src="${imgSrc}" alt="${data.attorney}" />
+              <div class="rank-badge">#${data.rank}</div>
+            </div>
+            <div class="entity-role">Attorney</div>
+            <div class="entity-name">${data.attorney}</div>
+            <div class="score-badge">Score: ${data.score}</div>
+          `;
+        } else if (type === 'closing') {
+          cardEl.innerHTML = `
+            <div class="stat-number" style="font-size:3rem;">🎯</div>
+            <div class="entity-name" style="font-size:1.3rem;">Your game plan is ready</div>
+          `;
+        }
+        cardEl.classList.add('visible');
+      }, 300);
+    }
+  </script>
+
+</body>
+</html>

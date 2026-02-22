@@ -1,16 +1,19 @@
 import requests
 import json
 import re
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
-OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL = "llama3"
+OPENROUTER_API_KEY = os.environ["OPENROUTER_API_KEY"]
+OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 
 def resolve_state_code(city_input: str) -> str:
     """
     Takes a city name or a sentence containing a city name and returns
-    the two-letter US state code using a local Ollama llama3 model.
+    the two-letter US state code using OpenRouter (Gemini Flash).
 
     Args:
         city_input: A city name (e.g. "Austin") or a sentence
@@ -28,16 +31,26 @@ def resolve_state_code(city_input: str) -> str:
         f"State abbreviation:"
     )
 
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://github.com/cold-cases",
+        "X-Title": "Cold Cases State Lookup",
+    }
+
     payload = {
-        "model": MODEL,
-        "prompt": prompt,
-        "stream": False,
+        "model": "google/gemini-2.0-flash-lite-001",
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.0,
+        "max_tokens": 4,
     }
 
     try:
-        response = requests.post(OLLAMA_URL, json=payload, timeout=30)
+        response = requests.post(
+            OPENROUTER_URL, headers=headers, json=payload, timeout=15
+        )
         response.raise_for_status()
-        result = response.json().get("response", "").strip()
+        result = response.json()["choices"][0]["message"]["content"].strip()
 
         # Extract just the two-letter code from the response
         match = re.search(r"\b([A-Z]{2})\b", result)
@@ -46,13 +59,13 @@ def resolve_state_code(city_input: str) -> str:
         return f"Could not parse state code from response: {result}"
 
     except requests.ConnectionError:
-        return "Error: Cannot connect to Ollama. Is it running on localhost:11434?"
+        return "Error: Cannot connect to OpenRouter API."
     except requests.Timeout:
-        return "Error: Ollama request timed out."
+        return "Error: OpenRouter request timed out."
     except Exception as e:
         return f"Error: {e}"
 
 
 if __name__ == "__main__":
     code = resolve_state_code("miami")
-    print(f"{"miami"!r:50s} -> {code}")
+    print(f"{'miami'!r:50s} -> {code}")

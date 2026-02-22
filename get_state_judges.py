@@ -8,7 +8,7 @@ with open(_JSON_PATH) as f:
     _STATE_JUDGES: dict[str, list[str]] = json.load(f)
 
 
-def get_judges(state_code: str) -> list[str]:
+def get_state_judges(state_code: str) -> list[str]:
     """Return the list of judges for a two-letter US state code.
 
     Args:
@@ -22,7 +22,7 @@ def get_judges(state_code: str) -> list[str]:
 
 if __name__ == "__main__":
     code = input("Enter a two-letter state code: ").strip()
-    judges = get_judges(code)
+    judges = get_state_judges(code)
     if judges:
         print(f"\nJudges for {code.upper()} ({len(judges)}):")
         for name in judges:

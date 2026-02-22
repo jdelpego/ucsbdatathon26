@@ -9,7 +9,7 @@ OPENROUTER_API_KEY = os.environ["OPENROUTER_API_KEY"]
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 
-def get_local_judges(location_description: str, judges_list: list[str]) -> list[str]:
+def get_district_judges(location_description: str, judges_list: list[str]) -> list[str]:
     """
     Given a location description and a list of judge names, uses OpenRouter
     LLM (with web search) to determine which judges are currently active
@@ -92,17 +92,17 @@ def get_local_judges(location_description: str, judges_list: list[str]) -> list[
 
 
 if __name__ == "__main__":
-    from get_judges_list import get_judges
+    from get_state_judges import get_state_judges
 
     # Example: look up judges for a location in California
     location = "I need help on a case in San Diego"
-    state_judges = get_judges("CA")
+    state_judges = get_state_judges("CA")
 
     print(f"Location: {location}")
     print(f"Total CA judges in list: {len(state_judges)}")
     print(f"\nQuerying OpenRouter for active judges in that district...\n")
 
-    active = get_local_judges(location, state_judges)
+    active = get_district_judges(location, state_judges)
 
     if active:
         print(f"Active judges for this district ({len(active)}):")

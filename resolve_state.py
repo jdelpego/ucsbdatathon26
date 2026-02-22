@@ -7,7 +7,7 @@ OLLAMA_URL = "http://localhost:11434/api/generate"
 MODEL = "llama3"
 
 
-def get_state_code(city_input: str) -> str:
+def resolve_state_code(city_input: str) -> str:
     """
     Takes a city name or a sentence containing a city name and returns
     the two-letter US state code using a local Ollama llama3 model.
@@ -54,5 +54,5 @@ def get_state_code(city_input: str) -> str:
 
 
 if __name__ == "__main__":
-    code = get_state_code("miami")
+    code = resolve_state_code("miami")
     print(f"{"miami"!r:50s} -> {code}")

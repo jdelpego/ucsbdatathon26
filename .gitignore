@@ -1,0 +1,8 @@
+.venv
+.venv/*
+hf_data/*
+.hf_data
+*.parquet
+*.txt
+*.json
+.env
